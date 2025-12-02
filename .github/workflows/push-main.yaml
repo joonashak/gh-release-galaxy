@@ -1,0 +1,11 @@
+name: Push
+
+on:
+  push:
+
+jobs:
+  asd:
+    uses: ./.github/workflows/publish-image.yaml
+    secrets: inherit
+    with:
+      version: next

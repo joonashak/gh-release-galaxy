@@ -61,3 +61,13 @@ jobs:
           git tag -f "$GITHUB_REF_NAME"
           git push origin ":$GITHUB_REF"
           git push origin "$GITHUB_REF"
+
+  release:
+    name: Release
+    needs:
+      - check-tag
+      - publish
+    uses: ./.github/workflows/publish-image.yaml
+    secrets: inherit
+    with:
+      version: ${{ needs.check-tag.outputs.version }}

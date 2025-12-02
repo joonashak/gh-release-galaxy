@@ -1,0 +1,27 @@
+name: Publish image
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+        description: |
+          Either a semantic version or "next" if creating an ephemeral release
+          from the head of the main branch.
+
+jobs:
+  asd:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create tags
+        id: create_tags
+        run: |
+          if [ "${{ inputs.version }}" = "next" ]; then
+            echo "tags=my-image:next" >> $GITHUB_OUTPUT
+          else
+            echo "tags=my-image:latest,my-image:${{ inputs.version }}" >> $GITHUB_OUTPUT
+          fi
+
+      - run: |
+          echo ${{ steps.create_tags.outputs.tags }}
