@@ -6,24 +6,52 @@ on:
 
 jobs:
   # Simple sanity check before moving on with the release flow.
-  # Semantic version tags should start with "v" as per GitHub guidelines.
   check-tag:
     name: Check release tag
     runs-on: ubuntu-24.04
     steps:
-      - name: Check tag format and extract semantic version
+      - run: |
+          echo "${GITHUB_REF}"
+      - name: Check tag format and extract version
         run: |
-          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
-            VERSION="${GITHUB_REF#refs/tags/v}"
+          if [[ "${GITHUB_REF}" == refs/tags/*.*.* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/}"
             echo "VERSION=$VERSION" >> $GITHUB_ENV
           else
-            echo "::error::Release tag must start with 'v'."
+            echo "::error::Release tag is not valid."
             exit 1
           fi
 
-  release:
+  publish:
+    name: Publish
     needs: check-tag
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Change to main branch
+        run: |
+          git fetch origin main:main
+          git checkout main
+
+      - name: Update Ansible Galaxy collection version
+        run: |
+          sed -i "s/^version: .*/version: $VERSION/" galaxy.yml
+
+      - name: Commit galaxy.yml version update
+        run: |
+          git add galaxy.yml
+          git commit -m "Update galaxy.yml version to $VERSION"
+          git push
+
+      - name: Amend release tag to include previous commit
+        run: |
+          git tag -f "$GITHUB_REF_NAME"
+          git push origin ":$GITHUB_REF"
+          git push origin "$GITHUB_REF"

@@ -1,0 +1,25 @@
+namespace: example
+
+name: example
+
+version: 0.0.1
+
+readme: README.md
+
+authors:
+
+description: your collection description
+
+license_file: ""
+
+tags: []
+
+dependencies: {}
+
+repository: https://github.com/example/example
+
+documentation: https://github.com/example/example
+
+homepage: https://github.com/example/example
+issues: https://github.com/example/example/issues
+build_ignore: []
