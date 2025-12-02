@@ -25,3 +25,10 @@ jobs:
 
       - run: |
           echo ${{ steps.create_tags.outputs.tags }}
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Verify correct checkout
+        run: |
+          cat galaxy.yml
