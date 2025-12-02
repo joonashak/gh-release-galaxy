@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  # Simple sanity check before moving on with the release flow.
+  # Semantic version tags should start with "v" as per GitHub guidelines.
+  check-tag:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check tag format and extract semantic version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+          else
+            echo "Release tag must start with 'v'."
+            exit 1
+          fi
+
+  release:
+    needs: check-tag
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
