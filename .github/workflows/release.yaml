@@ -12,14 +12,17 @@ jobs:
   check-tag:
     name: Check release tag
     runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.extract-version.outputs.version }}
     steps:
       - run: |
           echo "${GITHUB_REF}"
       - name: Check tag format and extract version
+        id: extract-version
         run: |
           if [[ "${GITHUB_REF}" == refs/tags/*.*.* ]]; then
             VERSION="${GITHUB_REF#refs/tags/}"
-            echo "VERSION=$VERSION" >> $GITHUB_ENV
+            echo "version=$VERSION" >> $GITHUB_ENV
           else
             echo "::error::Release tag is not valid."
             exit 1
@@ -45,7 +48,7 @@ jobs:
 
       - name: Update Ansible Galaxy collection version
         run: |
-          sed -i "s/^version: .*/version: $VERSION/" galaxy.yml
+          sed -i "s/^version: .*/version: ${{ needs.check-tag.outputs.version }}/" galaxy.yml
 
       - name: Commit galaxy.yml version update
         run: |
