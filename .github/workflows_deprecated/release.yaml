@@ -53,7 +53,7 @@ jobs:
       - name: Commit galaxy.yml version update
         run: |
           git add galaxy.yml
-          git commit -m "Update galaxy.yml version to $VERSION"
+          git commit -m "Update galaxy.yml version to ${{ needs.check-tag.outputs.version }}"
           git push --set-upstream origin main
 
       - name: Amend release tag to include previous commit
