@@ -2,7 +2,7 @@ namespace: example
 
 name: example
 
-version: 123
+version: 0.0.14
 
 readme: README.md
 
