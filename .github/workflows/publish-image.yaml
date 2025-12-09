@@ -25,14 +25,15 @@ jobs:
             echo "ref=refs/tags${{ inputs.version }}"
           fi
 
-      - run: |
-          echo ${{ steps.create_tags.outputs.tags }}
-
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          ref: ${{ steps.create_tags.outputs.ref }}
 
       - name: Verify correct checkout
         run: |
           cat galaxy.yml
+
+      - name: Verify tags
+        run: |
+          echo ${{ steps.create_tags.outputs.tags }}
+
+      # Acual publish here.

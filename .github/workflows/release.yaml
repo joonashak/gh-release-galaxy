@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  version-tag:
+    name: Check release tag
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.extract-version.outputs.version }}
+    steps:
+      - run: |
+          echo "${GITHUB_REF}"
+      - name: Check tag format and extract version
+        id: extract-version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/*.*.* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/}"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "::error::Release tag is not valid."
+            exit 1
+          fi
+
+          galaxy_version=$(grep -E '^version:' galaxy.yml | awk '{print $2}')
+
+          if [[ "$GITHUB_REF" != "$galaxy_version" ]]; then
+            echo "::error::Release tag does not match galaxy.yaml version."
+            exit 2
+          fi
+
+  release:
+    name: Release
+    needs:
+      - version-tag
+    uses: ./.github/workflows/publish-image.yaml
+    secrets: inherit
+    with:
+      version: ${{ needs.version-tag.outputs.version }}
