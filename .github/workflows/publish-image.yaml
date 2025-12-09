@@ -17,11 +17,13 @@ jobs:
       - name: Create tags
         id: create_tags
         run: |
+          image_name="what"
+
           if [ "${{ inputs.version }}" = "next" ]; then
-            echo "tags=my-image:next" >> $GITHUB_OUTPUT
+            echo "tags=${image_name}:next" >> $GITHUB_OUTPUT
             echo "ref=refs/heads/main"
           else
-            echo "tags=my-image:latest,my-image:${{ inputs.version }}" >> $GITHUB_OUTPUT
+            echo "tags=${image_name}:latest,${image_name}:${{ inputs.version }}" >> $GITHUB_OUTPUT
             echo "ref=refs/tags${{ inputs.version }}"
           fi
 
